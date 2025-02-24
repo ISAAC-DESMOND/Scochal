@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\DirectMsgController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TeamController;
-use App\Http\COntrollers\SportMatchController;
+use App\Http\Controllers\SportMatchController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
