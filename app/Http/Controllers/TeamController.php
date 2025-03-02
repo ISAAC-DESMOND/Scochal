@@ -28,7 +28,7 @@ class TeamController extends Controller
         $teams=team::orderBy('created_at','desc')->get();
         }
         
-        return view('team.all',compact('teams','team_ids'));
+        return view('teams.teams',compact('teams','team_ids'));
     }
 
     public function team_index()
