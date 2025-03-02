@@ -28,7 +28,7 @@ class TeamController extends Controller
         $teams=team::orderBy('created_at','desc')->get();
         }
         
-        return view('teams.teams',compact('teams','team_ids'));
+        return view('teams.all',compact('teams','team_ids'));
     }
 
     public function team_index()
@@ -63,7 +63,7 @@ class TeamController extends Controller
             'status' => 'member',
         ]);
 
-        return redirect()->route('team.teams');
+        return redirect()->route('team.all');
     }
 
     public function join_team(Request $request)
@@ -73,7 +73,7 @@ class TeamController extends Controller
         ]);
 
         if(member_joins::where('team_id', $request->team_id)->where('user_id', Auth::id())->where('status', 'requested')->exists()){    
-            return redirect()->route('team.teams');
+            return redirect()->route('team.all');
         }
         member_joins::create([
             'team_id' => $request->team_id,
@@ -81,7 +81,7 @@ class TeamController extends Controller
             'status' => 'requested',
         ]);
 
-        return redirect()->route('team.teams');
+        return redirect()->route('team.all');
     }
 
     public function accept(Request $request){
@@ -218,6 +218,6 @@ class TeamController extends Controller
     {
         $team=team::find($team_id);
         $team->delete();
-        return redirect()->route('team.teams');
+        return redirect()->route('team.all');
     }
 }
