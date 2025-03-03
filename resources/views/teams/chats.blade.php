@@ -8,10 +8,10 @@
                     
                 </div>
 
-            <form  method="POST" action="{{ route('team.store') }}">
+            <form  method="POST" action="{{ route('team.store') }}" class="w-full flex" style="padding:1%;">
                 @csrf
                 <input type="hidden" id="team_id" name="team_id" value="{{ $team_id ?? '' }}">
-                <x-text-input id="message" class=" bg-white dark:bg-gray-800 border rounded p-3 mt-1" style="width:86em;margin:1%;" type="text" name="message"/>
+                <x-text-input id="message" class=" bg-white dark:bg-gray-800 border rounded p-3 mt-1 flex-grow" style="right-margin:1%;" type="text" name="message"/>
                     <x-primary-button class="ms-4" id="submit_btn">
                         {{ __('Send') }}
                     </x-primary-button>
