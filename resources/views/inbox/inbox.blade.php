@@ -47,7 +47,7 @@
                     }
             });
 
-        setTimeout(onload,5000);
+        setTimeout(onload,1000);
     }
 </script>
 @endsection
