@@ -34,7 +34,10 @@ class DirectMsgController extends Controller
 
 
         }
-        return $users;
+         return response()->json([
+        'users' => $users,
+        'last_msgs' => $last_msgs,
+    ]);
     }
 
     public function show(){
