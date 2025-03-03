@@ -25,21 +25,21 @@
         // Handle user item click
         fetch(`/inbox/all`)
             .then(response => response.json())
-            .then(users => {
+            .then(data => {
                         user_div.innerHTML = ''; // Clear previous messages
                         
-                        if(!users||users.length==0){
+                        if(!data.users||data.users.length==0){
                             return;
                         }
                         else{
-                        users.forEach(user => {
+                        data.users.forEach(user => {
                             const user_name=document.createElement("li");
                             user_name.style.margin='1%';
-                            user_name.innerHTML=`<li class="block w-full bg-white dark:bg-gray-800 shadow mx-auto py-6 px-4 sm:px-6 lg:px-8 rounded-md font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight hover:scale-120 transition-transform duration-300 ease-in-out" user-id="{{$user->id}}">
-                            {{$user->name }} : {{$last_msgs[$user->id]}}
+                            user_name.innerHTML=`<li class="block w-full bg-white dark:bg-gray-800 shadow mx-auto py-6 px-4 sm:px-6 lg:px-8 rounded-md font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight hover:scale-120 transition-transform duration-300 ease-in-out" user-id="${user.id}">
+                            ${user.name} : ${data.last_msgs[user.id]}
                             </li>`;
                             user_name.addEventListener('click', function () {
-                                var recipient_id = {{$user->id}};
+                                var recipient_id = user.id;
                                 window.location.href = `/inbox/create/${recipient_id}`;
                             });
                             user_div.appendChild(user_name);
