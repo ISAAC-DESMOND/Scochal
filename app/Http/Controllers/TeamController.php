@@ -16,19 +16,19 @@ class TeamController extends Controller
      */
     public function index()
     {
+    $team_ids = member_joins::where('user_id', Auth::id())
+        ->where('status', 'member')
+        ->pluck('team_id')
+        ->toArray();
 
-        $team_ids = member_joins::where('user_id',Auth::id())->where('status', 'member')->pluck('team_id')->toArray();
-        if(empty($team_ids)){
-            $teams=team::orderBy('created_at','desc')->get();
-        }
-        else{
-            $teams = team::orderByRaw(
-            "FIELD(id, " . implode(',', $team_ids) . ") DESC, created_at DESC"
-        )->get();
-        $teams=team::orderBy('created_at','desc')->get();
-        }
-        
-        return view('teams.teams',compact('teams','team_ids'));
+    $requested_team_ids = member_joins::where('user_id', Auth::id())
+        ->where('status', 'requested')
+        ->pluck('team_id')
+        ->toArray();
+
+    $teams = team::orderBy('created_at', 'desc')->get();
+
+    return view('teams.teams', compact('teams', 'team_ids', 'requested_team_ids'));
     }
 
     public function team_index()
