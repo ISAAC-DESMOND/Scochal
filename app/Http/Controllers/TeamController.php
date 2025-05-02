@@ -175,7 +175,7 @@ class TeamController extends Controller
                 'status' => $member->status, 
                 'created_at' => $member->created_at
                 ];
-            })->reject(function($member) use($user_id){return $member['user_id'] == $user_id;});
+            });
         }
         else{
             $members = member_joins::where('team_id',$team_id)->orderByRaw(
@@ -190,7 +190,7 @@ class TeamController extends Controller
                     'status' => $member->status, 
                     'created_at' => $member->created_at
                     ];
-                })->reject(function($member) use($user_id) {return $member['user_id'] == $user_id;});
+                });
         }
         
         return view('teams.members',compact('members','members_ids'));
