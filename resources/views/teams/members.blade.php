@@ -4,7 +4,7 @@
         $team_id = App\Models\member_joins::where('user_id',Auth::id())->where('status', 'member')->pluck('team_id')->first();
         $team_name =App\Models\team::where('id', $team_id)->pluck('name')->first();
     @endphp
-@team_manager($team_id)
+@team_member($team_id)
     <div class="container mx-auto my-6">
         <h3 class="bg-white dark:bg-gray-800 shadow mx-auto py-6 px-4 sm:px-6 lg:px-8 font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Manage Team: {{ $team_name}}</h3>
         <div>
@@ -21,6 +21,7 @@
                                 {{ __('Message Member') }}
                             </x-primary-button>
                         </form>
+                        @team_manager($team_id)
                         <form action="{{ route('team.remove') }}" method="POST">
                             @csrf
                             <input type="hidden" id="team" name="team_id" value="{{$member['team_id']}}">
@@ -29,8 +30,10 @@
                                 {{ __('Remove Member') }}
                             </x-primary-button>
                         </form>
+                        @endteam_manager
                     </div>
                     @else
+                        @team_manager($team_id)
                         <div class="bg-white dark:bg-gray-700 shadow flex items-center justify-between p-4 border rounded shadow" style="margin:0.5em;">
                             <p class="text-lg text-gray-800 dark:text-gray-200">{{ $member['user_name'] }}</p>
                             <form action="{{ route('team.accept')}}" method="POST">
@@ -56,12 +59,13 @@
                                 </x-primary-button>
                             </form>
                         </div>
+                        @endteam_manager
                     @endif
                 @endforeach
             </div>
         </div>
-
-        <!-- Delete Team Button (only visible to the team creator) -->
+        @endteam_member
+        @team_manager($team_id)
             <div class="mt-6">
                 <form action="{{ route('team.delete', [$team_id]) }}" method="POST">
                     @csrf
