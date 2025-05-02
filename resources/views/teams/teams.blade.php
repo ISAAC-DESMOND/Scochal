@@ -1,14 +1,28 @@
 <x-app-layout>
+    <x-slot name="header">
+    <div class="flex flex-row items-center justify-between space-x-4">
+        <!-- Header Title -->
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Teams') }}
+        </h2>
+
+        <!-- Create Match Button (Only for Team Creators) -->
+        @created(Auth::id())
+            <a href="{{ route('match.create') }}" class="bg-white dark:bg-gray-700 rounded shadow py-2 px-4 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                Create Match
+            </a>
+        @endcreated
+
+        <!-- Create Team Button -->
+        <a href="{{ route('team.create') }}" class="bg-white dark:bg-gray-700 rounded shadow py-2 px-4 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+            Create Team
+        </a>
+    </div>
+    </x-slot>
+
     <div id="messenger" class="container">
         <div class="row">
-            <div class="col-md-4">
-                <div class="bg-white dark:bg-gray-800 shadow mx-auto py-1 px-1 sm:px-3 lg:px-5 w-full font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight" style="display:flex;flex-direction:row;">
-                    <h1 class="bg-white dark:bg-gray-800 shadow mx-auto py-6 px-4 sm:px-6 lg:px-8 font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Teams</h1>
-                    @created
-                    <a href={{route('match.create')}} class="mt-1 bg-white dark:bg-gray-700 rounded shadow mx-auto py-6 px-4 sm:px-6 lg:px-8" style="margin-left: auto;">Create Match</a>
-                    @endcreated 
-                    <a href={{route('team.create')}} class="mt-1 bg-white dark:bg-gray-700 rounded shadow mx-auto py-6 px-4 sm:px-6 lg:px-8" style="margin-left: auto;">Create Team</a>
-                    </div>
+            <div class="col-md-4 w-full">
                 <ul id="team_list" class="block mt-1 w-full" style="display:flex;flex-direction:row;">
                     
                 </ul>
