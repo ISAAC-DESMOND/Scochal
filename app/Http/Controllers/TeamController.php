@@ -155,45 +155,24 @@ class TeamController extends Controller
         return redirect(route('team.show',['team_id' => $team_id]));
     }
 
-    public function edit($team_id){
-
-        $members_ids = member_joins::where('team_id',$team_id)->where('status', 'member')->pluck('user_id')->toArray();
-        
-        $team=team::where('id',$team_id)->first();
-        $user_id=$team->user_id;
-
-        if(empty($members_ids)){
-            $members=member_joins::where('team_id',$team_id)->orderBy('created_at', 'desc')
-            ->with('user:id,name') // Eager load sender's name
-            ->get()
-            ->map(function ($member) {
-            return [
-                'team_id' => $member->team_id,
-                'team_name' => $member->team->name,
-                'user_id' => $member->user_id,
-                'user_name' => $member->user->name,    
-                'status' => $member->status, 
-                'created_at' => $member->created_at
-                ];
-            });
-        }
-        else{
-            $members = member_joins::where('team_id',$team_id)->orderByRaw(
-            "FIELD(id, " . implode(',', $members_ids) . ") DESC, created_at DESC"
-            )->get()
-            ->map(function ($member) {
-                return [
-                    'team_id' => $member->team_id,
-                    'team_name' => $member->team->name,
-                    'user_id' => $member->user_id,
-                    'user_name' => $member->user->name, 
-                    'status' => $member->status, 
-                    'created_at' => $member->created_at
-                    ];
-                });
-        }
-        
-        return view('teams.members',compact('members','members_ids'));
+    public function edit($team_id)
+    {
+        $team = Team::find($team_id);
+        $manager_id = $team->user_id;
+    
+        $all = member_joins::where('team_id', $team_id)
+            ->with('user') // Eager load user data (name, etc.)
+            ->get();
+    
+        $manager = $all->firstWhere('user_id', $manager_id);
+        $members = $all->filter(function ($member) use ($manager_id) {
+            return $member->status === 'member' && $member->user_id !== $manager_id;
+        });
+        $candidates = $all->filter(function ($member) {
+            return $member->status !== 'member';
+        });
+    
+        return view('teams.members',compact('manager','members','candidates','team_id');
     }
 
     public function chat($user_id)
