@@ -43,7 +43,7 @@
                                 @csrf
                                 <input type="hidden" name="team_id" value="{{ $team->id }}">
                                 <x-primary-button class="mt1 justify-center px-4 w-full">
-                                {{ __('Edit Team') }}
+                                {{ __('View Members') }}
                             </x-primary-button>
                             </form>
                             @endif
