@@ -21,7 +21,6 @@
         function onload() {
 
             const team_div = document.getElementById('team_list');
-            // Handle user item click
             fetch(`/teams/all`)
                 .then(response => response.json())
                 .then(teams => {
@@ -33,32 +32,29 @@
                         <li class="user bg-white dark:bg-gray-800 shadow mx-auto py-6 px-4 sm:px-6 lg:px-8 rounded-md font-semibold text-l text-gray-800 dark:text-gray-200 leading-tight hover:scale-120 transition-transform duration-300 ease-in-out">
                             Team Name: {{ $team->name }}</br> Sport Played: {{$team->description}}
                             @if (in_array($team->id, $team_ids))
-    <!-- Already a member -->
-    <form action="{{route('team.show',$team->id)}}" method="GET">
-        @csrf
-        <input type="hidden" name="team_id" value="{{ $team->id }}">
-        <x-primary-button class="mt1 justify-center px-4 w-full">
-            {{ __('Enter Team') }}
-        </x-primary-button>
-    </form>
-    @if(Auth::id() === $team->user_id)
-        <form action="{{route('team.edit',$team->id)}}" method="GET">
-            @csrf
-            <input type="hidden" name="team_id" value="{{ $team->id }}">
-            <x-primary-button class="mt1 justify-center px-4 w-full">
-                {{ __('Edit Team') }}
-            </x-primary-button>
-        </form>
-    @endif
+                                <form action="{{route('team.show',$team->id)}}" method="GET">
+                                    @csrf
+                                    <input type="hidden" name="team_id" value="{{ $team->id }}">
+                                    <x-primary-button class="mt1 justify-center px-4 w-full">
+                                    {{ __('Team Chatroom') }}
+                                    </x-primary-button>
+                                </form>
+                                <form action="{{route('team.edit',$team->id)}}" method="GET">
+                                @csrf
+                                <input type="hidden" name="team_id" value="{{ $team->id }}">
+                                <x-primary-button class="mt1 justify-center px-4 w-full">
+                                {{ __('Edit Team') }}
+                            </x-primary-button>
+                            </form>
+                            @endif
 
-@elseif(in_array($team->id, $requested_team_ids))
-    <!-- Request Pending -->
-    <div class="flex items-center justify-center text-yellow-500 mt-2">
-        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"></path>
-        </svg>
-        Request Pending
-    </div>
+                            @elseif(in_array($team->id, $requested_team_ids))
+                                <div class="flex items-center justify-center text-yellow-500 mt-2">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"></path>
+                                </svg>
+                                Request Pending
+                            </div>
 
                             @else
                                 <form action="{{route('team.join')}}" method="POST">
