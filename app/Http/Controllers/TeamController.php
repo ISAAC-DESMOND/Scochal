@@ -63,7 +63,10 @@ class TeamController extends Controller
             'status' => 'member',
         ]);
 
-        return redirect()->route('team.all');
+         return redirect()->route('team.all')->with('notification', [
+            'type' => 'success',
+            'message' => 'New team created!',
+        ]);
     }
 
     public function join_team(Request $request)
@@ -81,7 +84,10 @@ class TeamController extends Controller
             'status' => 'requested',
         ]);
 
-        return redirect()->route('team.all');
+         return redirect()->route('team.all')->with('notification', [
+            'type' => 'success',
+            'message' => 'You have requested to join!',
+        ]);
     }
 
     public function accept(Request $request){
@@ -93,7 +99,10 @@ class TeamController extends Controller
         $member=member_joins::where('team_id', $request->team_id)->where('user_id', $request->user_id)->first();
         $member->update(['status' => 'member']);
 
-        return redirect(route('team.edit',['team_id' => $request->team_id]));
+        return redirect(route('team.edit',['team_id' => $request->team_id]))->with('notification', [
+            'type' => 'success',
+            'message' => 'Join Request Accepted!',
+        ]);
     }
 
     public function decline(Request $request){
@@ -103,7 +112,10 @@ class TeamController extends Controller
         ]);
         $member=member_joins::where('team_id', $request->team_id)->where('user_id', $request->user_id)->first();
         $member->delete();
-        return redirect(route('team.edit',['team_id' => $request->team_id]));
+         return redirect(route('team.edit',['team_id' => $request->team_id]))->with('notification', [
+            'type' => 'info',
+            'message' => 'Join Request Declined!',
+        ]);
     }
 
     public function show_chats($team_id){
@@ -190,13 +202,20 @@ class TeamController extends Controller
     $member = Member_joins::where('team_id', $request->team_id)->where('user_id', $request->user_id)->first();
     $member->delete();
 
-    return redirect()->route('team.edit', $request->team_id);
-}
+     return redirect()->route('team.edit', $request->team_id)->with('notification', [
+            'type' => 'info',
+            'message' => 'User has been removed from this team!',
+        ]);
+    
+    }
 
     public function destroy($team_id)
     {
         $team=team::find($team_id);
         $team->delete();
-        return redirect()->route('team.all');
+         return redirect()->route('team.all')->with('notification', [
+            'type' => 'info',
+            'message' => 'your team has been deleted!',
+        ]);
     }
 }
