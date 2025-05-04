@@ -43,6 +43,12 @@
             #img_file {
                 display: none;
             }
+            .notification-box.success {
+                 background-color: #4CAF50;
+            }
+            .notification-box.info {
+                background-color: #2196F3;
+            }
         </style>
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -50,6 +56,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen ">
@@ -63,6 +70,12 @@
                     </div>
                 </header>
             @endisset
+            @if(session('notification'))
+                <x-notification
+                        :type="session('notification')['type']"
+                        :message="session('notification')['message']"
+                />
+            @endif
 
             <!-- Page Content -->
             <main>
