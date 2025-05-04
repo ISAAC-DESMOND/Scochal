@@ -86,11 +86,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/team/member/remove', [TeamController::class, 'remove'])->name('team.remove');
     Route::post('/team/delete/{team_id}', [TeamController::class, 'destroy'])->name('team.delete');
 
+
     Route::get('/matches/create', [SportMatchController::class, 'create'])->name('match.create');
+    Route::get('/matches/edit/{match_id}',[SportMatchController::class,'edit'])->name('match.edit');
     Route::get('/matches', [SportMatchController::class, 'index'])->name('match.all');
     Route::get('/matches/all', [SportMatchController::class, 'list_all'])->name('match.listed');
     Route::post('/matches/store', [SportMatchController::class, 'store'])->name('match.store');
-
+    Route::post('matches/negotiate', [SportMatchController::class, 'negotiate'])->name('match.negotiate');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
