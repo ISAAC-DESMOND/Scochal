@@ -40,7 +40,10 @@ class PostController extends Controller
             'image_url' => $path,
         ]);
 
-        return redirect()->route('post.index');
+        return redirect()->route('post.index')->with('notification', [
+            'type' => 'success',
+            'message' => 'New post created!',
+        ]);
     }
 
     public function like(Request $request){
