@@ -31,8 +31,10 @@ class SportMatchController extends Controller
             'match_date' => $request->match_date,
             'court_location' => $request->court_location,
         ]);
-
-        return redirect()->route('match.all');
+        return redirect()->route('match.all')->with('notification', [
+            'type' => 'success',
+            'message' => 'Match request sent!',
+        ]);
     }
 
     public function index()
@@ -50,6 +52,30 @@ class SportMatchController extends Controller
             $matches = sport_match::orderBy('match_date', 'asc')->get();
         }
         return $matches;
+    }
+
+    public function negotiate(Request $request)
+    {
+        $match = sport_match::findOrFail($request->match_id);
+        $validated = $request->validate([
+            'court_location' => 'nullable|string|max:255',
+            'match_date' => 'required|date',
+            'home_team_score' => 'nullable|integer|min:0',
+            'away_team_score' => 'nullable|integer|min:0',
+        ]);
+
+        $match->update($validated);
+        return redirect()->route('match.all')->with('notification', [
+            'type' => 'success',
+            'message' => 'Match details changed!',
+        ]);
+    }
+
+    }
+
+    public function edit($match_id){
+        $match = sport_match::findOrFail($match_id);
+        return view('matches.edit', compact('match'));
     }
 
     public function destroy(sport_match $sport_match)
