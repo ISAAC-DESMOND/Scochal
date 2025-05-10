@@ -1,16 +1,17 @@
 <?php
 
 namespace App\Events;
-
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class notifyEvent
+class notifyEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -30,7 +31,7 @@ class notifyEvent
         return new PrivateChannel('user.' . $this->userId);
     }
 
-    public function broadcastWith()
+    public function broadcastWith(): array
     {
         return [
             'message' => $this->message,
@@ -43,3 +44,4 @@ class notifyEvent
         return 'notifyEvent';
     }
 }
+
