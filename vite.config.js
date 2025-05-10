@@ -8,4 +8,14 @@ export default defineConfig({
             refresh: true,
         }),
     ],
-});
+
+
+  server: command === 'serve'
+    ? {
+        hmr: {
+          host: 'localhost',
+          port: 8080,
+        },
+      }
+    : false,
+}));
