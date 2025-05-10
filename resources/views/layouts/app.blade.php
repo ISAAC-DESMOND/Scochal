@@ -56,7 +56,10 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+        <script>
+        window.userID ={{ Auth::id() }};
+        </script>
+
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen ">
@@ -71,18 +74,38 @@
                 </header>
             @endisset
             @if(session('notification'))
-                <x-notification
-                        :type="session('notification')['type']"
-                        :message="session('notification')['message']"
+                <x-notification 
+                        :type="session('notification')['type']" 
+                        :message="session('notification')['message']" 
                 />
             @endif
 
+        <div x-data="rtnotifications()" x-init="init()"  class="fixed top-5 left-1/2 transform -translate-x-1/2 space-y-2 z-50 w-f>
+          <template x-for="note in notifications" :key="note.id">
+             <div  x-data="{visible: false}"
+                x-init="setTimeout(() => show = false, 5000)"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 -translate-y-2"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 -translate-y-2"
+                class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 border rounded shadow-md w-full max-w-md not>
+                :class="note.type"
+                role="alert"
+                >
+                <div class="flex items-center space-x-3">
+                        <span x-text="note.message"></span>
+                </div>
+           </template>
+        </div>
+
             <!-- Page Content -->
-            <main>
+            <main class="w-full">
                 {{ $slot }}
-                @yield('scripts')
+
+     @yield('scripts')
             </main>
         </div>
-    </body>
+    </body>≈
 </html>
-
