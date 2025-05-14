@@ -11,10 +11,10 @@
 
             <!-- Message Sending Form -->
 
-            <form  method="POST" action="{{ route('inbox.store') }}">
+            <form  method="POST" action="{{ route('inbox.store') }}" class="w-full flex" style="padding:1%;">
                 @csrf
                 <input type="hidden" id="recipient_id" name="recipient_id" value="{{ $recipient_id ?? '' }}">
-                <x-text-input id="message" class=" bg-white dark:bg-gray-800 border rounded p-3 mt-1" style="width:86em;margin:1%;" type="text" name="message"/>
+                <x-text-input id="message" class=" bg-white dark:bg-gray-800 border rounded p-3 mt-1 flex-grow" style="right-margin:1%;" type="text" name="message"/>
                     <x-primary-button class="ms-4" id="submit_btn">
                         {{ __('Send') }}
                     </x-primary-button>

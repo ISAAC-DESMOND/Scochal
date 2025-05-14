@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\team;
+use App\Events\notifyEvent;
 use App\Models\member_joins;
 use App\Models\User;
 use App\Models\team_msgs;
@@ -16,19 +17,19 @@ class TeamController extends Controller
      */
     public function index()
     {
+	$team_ids = member_joins::where('user_id', Auth::id())
+        ->where('status', 'member')
+        ->pluck('team_id')
+        ->toArray();
 
-        $team_ids = member_joins::where('user_id',Auth::id())->where('status', 'member')->pluck('team_id')->toArray();
-        if(empty($team_ids)){
-            $teams=team::orderBy('created_at','desc')->get();
-        }
-        else{
-            $teams = team::orderByRaw(
-            "FIELD(id, " . implode(',', $team_ids) . ") DESC, created_at DESC"
-        )->get();
-        $teams=team::orderBy('created_at','desc')->get();
-        }
-        
-        return view('teams.teams',compact('teams','team_ids'));
+    $requested_team_ids = member_joins::where('user_id', Auth::id())
+        ->where('status', 'requested')
+        ->pluck('team_id')
+        ->toArray();
+
+    $teams = team::orderBy('created_at','desc')->get();
+
+    return view('teams.teams', compact('teams', 'team_ids', 'requested_team_ids'));
     }
 
     public function team_index()
@@ -63,7 +64,10 @@ class TeamController extends Controller
             'status' => 'member',
         ]);
 
-        return redirect()->route('team.teams');
+        return redirect()->route('team.all')->with('notification', [
+            'type' => 'success',
+            'message' => 'New team created!',
+        ]);
     }
 
     public function join_team(Request $request)
@@ -73,7 +77,7 @@ class TeamController extends Controller
         ]);
 
         if(member_joins::where('team_id', $request->team_id)->where('user_id', Auth::id())->where('status', 'requested')->exists()){    
-            return redirect()->route('team.teams');
+            return redirect()->route('team.all');
         }
         member_joins::create([
             'team_id' => $request->team_id,
@@ -81,7 +85,14 @@ class TeamController extends Controller
             'status' => 'requested',
         ]);
 
-        return redirect()->route('team.teams');
+        $team=team::find($request->team_id);
+
+        broadcast(new NotifyEvent($team->user_id,'Someone has requested to join '.$team->name,'info'));
+
+        return redirect()->route('team.all')->with('notification', [
+            'type' => 'success',
+            'message' => 'You have requested to join!',
+        ]);
     }
 
     public function accept(Request $request){
@@ -93,7 +104,14 @@ class TeamController extends Controller
         $member=member_joins::where('team_id', $request->team_id)->where('user_id', $request->user_id)->first();
         $member->update(['status' => 'member']);
 
-        return redirect(route('team.edit',['team_id' => $request->team_id]));
+        $team=team::find($request->team_id);
+
+        broadcast(new NotifyEvent($request->user_id,'Your request to join '.$team->name.' has been accepted','success'));
+
+        return redirect(route('team.edit',['team_id' => $request->team_id]))->with('notification', [
+            'type' => 'success',
+            'message' => 'Join Request Accepted!',
+        ]);
     }
 
     public function decline(Request $request){
@@ -103,7 +121,16 @@ class TeamController extends Controller
         ]);
         $member=member_joins::where('team_id', $request->team_id)->where('user_id', $request->user_id)->first();
         $member->delete();
-        return redirect(route('team.edit',['team_id' => $request->team_id]));
+
+	$team=team::find($request->team_id);
+
+	broadcast(new NotifyEvent($request->user_id,'Your request to join '.$team->name.' has been declined','info'));
+
+
+        return redirect(route('team.edit',['team_id' => $request->team_id]))->with('notification', [
+            'type' => 'info',
+            'message' => 'Join Request Declined!',
+        ]);
     }
 
     public function show_chats($team_id){
@@ -152,49 +179,38 @@ class TeamController extends Controller
 
         $team_id=$request->team_id;
 
+        $team=team::find($team_id);
+
+	$teamIds = member_joins::where('team_id', $team_id)
+	    ->where('status', 'member')
+	    ->pluck('user_id');
+	foreach($teamIds as $id){
+	        broadcast(new NotifyEvent($id,'new message on the '.$team->name.' team chatroom','success'));
+	}
+
         return redirect(route('team.show',['team_id' => $team_id]));
     }
 
-    public function edit($team_id){
-
-        $members_ids = member_joins::where('team_id',$team_id)->where('status', 'member')->pluck('user_id')->toArray();
-        
-        $team=team::where('id',$team_id)->first();
-        $user_id=$team->user_id;
-
-        if(empty($members_ids)){
-            $members=member_joins::where('team_id',$team_id)->orderBy('created_at', 'desc')
-            ->with('user:id,name') // Eager load sender's name
-            ->get()
-            ->map(function ($member) {
-            return [
-                'team_id' => $member->team_id,
-                'team_name' => $member->team->name,
-                'user_id' => $member->user_id,
-                'user_name' => $member->user->name,    
-                'status' => $member->status, 
-                'created_at' => $member->created_at
-                ];
-            })->reject(function($member) use($user_id){return $member['user_id'] == $user_id;});
-        }
-        else{
-            $members = member_joins::where('team_id',$team_id)->orderByRaw(
-            "FIELD(id, " . implode(',', $members_ids) . ") DESC, created_at DESC"
-            )->get()
-            ->map(function ($member) {
-                return [
-                    'team_id' => $member->team_id,
-                    'team_name' => $member->team->name,
-                    'user_id' => $member->user_id,
-                    'user_name' => $member->user->name, 
-                    'status' => $member->status, 
-                    'created_at' => $member->created_at
-                    ];
-                })->reject(function($member) use($user_id) {return $member['user_id'] == $user_id;});
-        }
-        
-        return view('teams.members',compact('members','members_ids'));
+    public function edit($team_id)
+    {
+        $team = Team::find($team_id);
+        $manager_id = $team->user_id;
+    
+        $all = member_joins::where('team_id', $team_id)
+            ->with('user') // Eager load user data (name, etc.)
+            ->get();
+    
+        $manager = $all->firstWhere('user_id', $manager_id);
+        $members = $all->filter(function ($member) use ($manager_id) {
+            return $member->status === 'member' && $member->user_id !== $manager_id;
+        });
+        $candidates = $all->filter(function ($member) {
+            return $member->status !== 'member';
+        });
+    
+        return view('teams.members', compact('manager','members','candidates','team_id'));
     }
+
 
     public function chat($user_id)
     {
@@ -208,16 +224,34 @@ class TeamController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
-    $member = Member_joins::where('team_id', $request->team_id)->where('user_id', $request->user_id)->first();
-    $member->delete();
+	$member = Member_joins::where('team_id', $request->team_id)->where('user_id', $request->user_id)->first();
+        $member->delete();
+        $team=team::find($request->team_id);
 
-    return redirect()->route('team.edit', $request->team_id);
-}
+        broadcast(new NotifyEvent($request->user_id,'You have been removed from '.$team->name,'info'));
+
+        return redirect()->route('team.edit', $request->team_id)->with('notification', [
+            'type' => 'info',
+            'message' => 'User has been removed from this team!',
+        ]);
+    }
 
     public function destroy($team_id)
     {
         $team=team::find($team_id);
+
+        $teamIds = member_joins::where('team_id', $team_id)
+            ->where('status', 'member')
+            ->pluck('user_id');
+        foreach($teamIds as $id){
+                broadcast(new NotifyEvent($id,'The team '.$team->name.' has been deleted','info'));
+        }
+
+
         $team->delete();
-        return redirect()->route('team.teams');
+        return redirect()->route('team.all')->with('notification', [
+            'type' => 'info',
+            'message' => 'your team has been deleted!',
+        ]);
     }
 }

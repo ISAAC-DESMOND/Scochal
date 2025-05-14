@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\DirectMsgController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TeamController;
-use App\Http\COntrollers\SportMatchController;
+use App\Http\Controllers\SportMatchController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
@@ -60,8 +60,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard/posts', [PostController::class, 'index'])->name('post.index');
     Route::post('/dashboard/post', [PostController::class, 'store'])->name('post.store');
-    Route::post('/dashboard/{post}/like', [PostController::class, 'like'])->name('post.like');
-    Route::post('/dashboard/{post}/dislike', [PostController::class, 'dislike'])->name('dislike');
+    Route::post('/dashboard/like', [PostController::class, 'like'])->name('post.like');
+    Route::post('/dashboard/dislike', [PostController::class, 'dislike'])->name('dislike');
 
     Route::get('/inbox', [DirectMsgController::class, 'show'])->name('inbox.show');
     Route::get('/inbox/all', [DirectMsgController::class, 'index'])->name('inbox.index');
@@ -87,10 +87,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/team/delete/{team_id}', [TeamController::class, 'destroy'])->name('team.delete');
 
     Route::get('/matches/create', [SportMatchController::class, 'create'])->name('match.create');
+    Route::get('/matches/edit/{match_id}',[SportMatchController::class,'edit'])->name('match.edit');
     Route::get('/matches', [SportMatchController::class, 'index'])->name('match.all');
     Route::get('/matches/all', [SportMatchController::class, 'list_all'])->name('match.listed');
     Route::post('/matches/store', [SportMatchController::class, 'store'])->name('match.store');
-
+    Route::post('matches/negotiate', [SportMatchController::class, 'negotiate'])->name('match.negotiate');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');

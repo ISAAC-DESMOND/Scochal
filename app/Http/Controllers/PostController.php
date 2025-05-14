@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\post;
+use App\Events\notifyEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,7 +41,10 @@ class PostController extends Controller
             'image_url' => $path,
         ]);
 
-        return redirect()->route('post.index');
+        return redirect()->route('post.index')->with('notification', [
+            'type' => 'success',
+            'message' => 'New post created!',
+        ]);
     }
 
     public function like(Request $request){
@@ -49,7 +53,8 @@ class PostController extends Controller
         ]);
 
         $post = Post::find($request->post_id);
-        $post->increment('likes_count');
+        $post->increment('like_count');
+        event(new notifyEvent( $post->user_id,'New like on your post ','success'));
         return redirect()->route('post.index');
 
     }
@@ -60,7 +65,8 @@ class PostController extends Controller
         ]);
 
         $post = Post::find($request->post_id);
-        $post->increment('dislikes_count');
+        $post->increment('dislike_count');
+        event(new notifyEvent( $post->user_id,'New dislike on your post ','info'));
         return redirect()->route('post.index');
 
     }

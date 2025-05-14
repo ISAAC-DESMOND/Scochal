@@ -38,9 +38,7 @@ class RegisteredUserController extends Controller
             Rules\Password::min(8) // Minimum 12 characters
                 ->mixedCase()   // Requires uppercase and lowercase
                 ->letters()     // Requires at least one letter
-                ->numbers()     // Requires at least one number
-                ->symbols()     // Requires at least one special character
-                ->uncompromised(), // Ensures the password has not been compromised
+                ->numbers(),     // Requires at least one number
         ],
         ]);
 

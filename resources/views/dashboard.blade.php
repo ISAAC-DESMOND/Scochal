@@ -31,12 +31,21 @@
                     <img src="{{ asset('storage/'.$post->image_url)}}" alt="Post Image" class="mt-2 w-full">
                 @endif
                 <div class="flex items-center mt-4">
-                    <button class="text-green-500 mr-4">
+		<form action="{{ route('post.like') }}" method="POST">
+		@csrf
+		<input type="hidden" name="post_id" value="{{$post->id}}">
+                    <button type="submit"  class="text-green-500 mr-4">
                         &#128077;({{$post->like_count}})
                     </button>
-                    <button class="text-red-500">
+		</form>
+
+		<form action="{{ route('dislike') }}" method="POST">
+		@csrf
+		<input type="hidden" name="post_id" value="{{$post->id}}">
+                    <button type="submit" class="text-red-500">
                         &#128078; ({{$post->dislike_count}})
                     </button>
+		</form>
                 </div>
             </div>
         @endforeach

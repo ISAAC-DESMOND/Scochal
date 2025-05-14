@@ -77,8 +77,17 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Feed') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('inbox.show')" :active="request()->routeIs('inbox.show')">
+                        {{ __('Inbox') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('team.all')" :active="request()->routeIs('team.all')">
+                        {{ __('Teams') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('match.all')" :active="request()->routeIs('match.all')">
+                        {{ __('Matches') }}
+                    </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
@@ -107,3 +116,4 @@
         </div>
     </div>
 </nav>
+

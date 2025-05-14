@@ -6,6 +6,7 @@ use App\Models\direct_msg;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Events\notifyEvent;
 
 class DirectMsgController extends Controller
 {
@@ -22,8 +23,8 @@ class DirectMsgController extends Controller
             ->orWhere('sender_id', Auth::id())
             ->orderBy('created_at', 'desc')->get();
 
-            $user_ids=$messages->pluck('recipient_id')->merge($messages->pluck('sender_id'))->unique()->reject(fn($user_id)=>$user_id==Auth::id())->values();
-            $users= User::whereIn('id', $user_ids)->get() ;
+           $user_ids=$messages->pluck('recipient_id')->merge($messages->pluck('sender_id'))->unique()->reject(fn($user_id)=>$user_id==Auth::id())->values();
+	   $users= User::whereIn('id', $user_ids)->get() ;
 
             foreach($users as $user){
                 $message=direct_msg::last($user->id);
@@ -34,7 +35,10 @@ class DirectMsgController extends Controller
 
 
         }
-        return $users;
+         return response()->json([
+        'users' => $users,
+        'last_msgs' => $last_msgs,
+        ]);
     }
 
     public function show(){
@@ -48,8 +52,8 @@ class DirectMsgController extends Controller
             ->orWhere('sender_id', Auth::id())
             ->orderBy('created_at', 'desc')->get();
 
-            $user_ids=$messages->pluck('recipient_id')->merge($messages->pluck('sender_id'))->unique()->reject(fn($user_id)=>$user_id==Auth::id())->values();
-            $users= User::whereIn('id', $user_ids)->get() ;
+	$user_ids=$messages->pluck('recipient_id')->merge($messages->pluck('sender_id'))->unique()->reject(fn($user_id)=>$user_id==Auth::id())->values();
+        $users= User::whereIn('id', $user_ids)->get() ;
 
             foreach($users as $user){
                 $message=direct_msg::last($user->id);
@@ -92,6 +96,9 @@ class DirectMsgController extends Controller
         ]);
 
         $recipient_id=$request->recipient_id;
+	$sendername=User::find(Auth::id())->__get('name');
+	event(new notifyEvent( $request->recipient_id, 'New message from '.$sendername,'success'));
+
 
         return redirect(route('inbox.create',['recipient_id' => $recipient_id]));
     }
